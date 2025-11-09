@@ -1,0 +1,19 @@
+[package]
+name = "service-health-monitor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+reqwest = "0.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+axum = "0.7"
+hyper = "1"
+tower = "0.5"
+chrono = "0.4"
+lettre = "0.11"
+trust-dns-resolver = "0.23"
+tokio-native-tls = "0.3"
+native-tls = "0.2"
+anyhow = "1"
