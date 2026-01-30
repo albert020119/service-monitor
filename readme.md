@@ -8,6 +8,16 @@ A small Rust service that periodically checks your services (HTTP, TCP, DNS, SSL
 - **Dashboard**: `GET /` (auto-refreshes every 5s)
 - **JSON API**: `GET /api/status`
 
+## Screenshots
+
+### Main dashboard
+
+![Main dashboard](documentation/images/main_dashboard.png)
+
+### Per-URL checks
+
+![Checks for a URL](documentation/images/checks.png)
+
 ## Quick start
 
 1. Edit `config.json` in the repo root.
