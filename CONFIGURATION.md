@@ -12,9 +12,11 @@ This project reads configuration from **`config.json`** in the repo root (hard-c
     {
       "name": "Example",
       "url": "https://example.com",
-      "check_type": "Http",
-      "interval_seconds": 30,
-      "timeout_ms": 5000
+      "checks": [
+        { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
+        { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 },
+        { "check_type": "Dns", "interval_seconds": 300, "timeout_ms": 3000 }
+      ]
     }
   ]
 }
@@ -23,10 +25,14 @@ This project reads configuration from **`config.json`** in the repo root (hard-c
 Fields:
 
 - **`name`**: Friendly name used in logs and in the dashboard.
-- **`url`**: Input to the check. The expected format depends on `check_type`.
+- **`url`**: Input shared by all checks in `checks`. Each check type interprets it slightly differently (details below).
+- **`checks`**: List of checks to run for this service.
+
+Each check entry:
+
 - **`check_type`**: One of `Http`, `Tcp`, `Dns`, `Ssl` (case-sensitive).
-- **`interval_seconds`**: Sleep time between checks for this service.
-- **`timeout_ms`**: Timeout applied to the request/connect/handshake.
+- **`interval_seconds`**: Sleep time between runs for this specific check.
+- **`timeout_ms`**: Timeout applied to the request/connect/handshake for this specific check.
 
 ## `check_type` details
 
@@ -61,15 +67,19 @@ Examples:
 
 Implementation: `src/monitor/dns_check.rs`
 
-- Performs a DNS A/AAAA lookup for the value of `url`.
-- `url` should be a hostname only.
+- Performs a DNS A/AAAA lookup for the host derived from `url`.
+- This check will accept a hostname *or* a full URL and will normalize it by stripping:
+  - `scheme://` if present
+  - any path after `/`
+  - a numeric `:port` suffix if present
 
 Good:
 - `example.com`
 - `internal.service.local`
+- `https://example.com`
+- `https://example.com:8443/health`
 
 Bad:
-- `https://example.com` (includes scheme)
 - `example.com/path` (includes path)
 
 ### `Ssl`

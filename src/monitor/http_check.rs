@@ -1,15 +1,15 @@
 use reqwest::Client;
-use crate::models::service::Service;
+use crate::models::service::{CheckConfig, Service};
 use crate::state::AppState;
 use std::time::Instant;
 
-pub async fn run(service: &Service, state: &AppState) {
+pub async fn run(service: &Service, check: &CheckConfig, state: &AppState) {
     let client = Client::new();
     let start = Instant::now();
     
     let result = client
         .get(&service.url)
-        .timeout(std::time::Duration::from_millis(service.timeout_ms))
+        .timeout(std::time::Duration::from_millis(check.timeout_ms))
         .send()
         .await;
 
@@ -23,29 +23,31 @@ pub async fn run(service: &Service, state: &AppState) {
             
             println!("{} OK ({})", service.name, status_code);
             
-            state.update_service_status(
+            state.update_check_status(
                 service.name.clone(),
                 service.url.clone(),
                 "HTTP".to_string(),
                 is_success,
                 Some(elapsed),
                 message,
-                service.interval_seconds,
-            ).await;
+                check.interval_seconds,
+            )
+            .await;
         },
         Err(e) => {
             let message = format!("Error: {}", e);
             println!("{} FAILED: {}", service.name, e);
             
-            state.update_service_status(
+            state.update_check_status(
                 service.name.clone(),
                 service.url.clone(),
                 "HTTP".to_string(),
                 false,
                 Some(elapsed),
                 message,
-                service.interval_seconds,
-            ).await;
+                check.interval_seconds,
+            )
+            .await;
         },
     }
 }

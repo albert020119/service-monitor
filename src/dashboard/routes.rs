@@ -194,15 +194,64 @@ pub async fn index() -> Html<&'static str> {
             opacity: 0.8;
         }
         
-        .check-type {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #dbeafe;
-            color: #1e40af;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .checks {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .check-row {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .check-row-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .check-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .check-chip.up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .check-chip.down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .check-chip.unknown {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .check-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .check-meta .detail-item {
+            margin: 0;
         }
         
         .next-check {
@@ -294,29 +343,33 @@ pub async fn index() -> Html<&'static str> {
         
         function updateProgressBars() {
             if (currentServices.length === 0) return;
-            
-            currentServices.forEach((service, index) => {
-                const lastCheck = new Date(service.last_check);
-                const now = new Date();
-                const elapsed = Math.floor((now - lastCheck) / 1000);
-                const interval = service.interval_seconds;
-                const remaining = Math.max(0, interval - elapsed);
-                const progress = Math.min(100, (elapsed / interval) * 100);
-                
-                const timeElement = document.querySelector(`[data-next-check="${index}"]`);
-                const progressElement = document.querySelector(`[data-progress="${index}"]`);
-                
-                if (timeElement) {
-                    if (remaining > 0) {
-                        timeElement.textContent = formatSeconds(remaining);
-                    } else {
-                        timeElement.textContent = 'checking...';
+
+            currentServices.forEach((service, sIndex) => {
+                const checks = Array.isArray(service.checks) ? service.checks : [];
+                checks.forEach((check, cIndex) => {
+                    const lastCheck = new Date(check.last_check);
+                    const now = new Date();
+                    const elapsed = Math.floor((now - lastCheck) / 1000);
+                    const interval = check.interval_seconds;
+                    const remaining = Math.max(0, interval - elapsed);
+                    const progress = interval > 0 ? Math.min(100, (elapsed / interval) * 100) : 0;
+
+                    const key = `${sIndex}-${cIndex}`;
+                    const timeElement = document.querySelector(`[data-next-check="${key}"]`);
+                    const progressElement = document.querySelector(`[data-progress="${key}"]`);
+
+                    if (timeElement) {
+                        if (remaining > 0) {
+                            timeElement.textContent = formatSeconds(remaining);
+                        } else {
+                            timeElement.textContent = 'checking...';
+                        }
                     }
-                }
-                
-                if (progressElement) {
-                    progressElement.style.width = progress + '%';
-                }
+
+                    if (progressElement) {
+                        progressElement.style.width = progress + '%';
+                    }
+                });
             });
         }
         
@@ -369,7 +422,6 @@ pub async fn index() -> Html<&'static str> {
                             ${service.status}
                         </div>
                     </div>
-                    <div class="check-type">${service.check_type}</div>
                     <div class="service-url">${escapeHtml(service.url)}</div>
                     <div class="service-details">
                         <div class="detail-item">
@@ -394,14 +446,45 @@ pub async fn index() -> Html<&'static str> {
                         </div>
                     </div>
                     ${service.message ? `<div class="message">${escapeHtml(service.message)}</div>` : ''}
-                    <div class="next-check">
-                        <div class="next-check-label">
-                            <span>Next check in</span>
-                            <span class="next-check-time" data-next-check="${index}">calculating...</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" data-progress="${index}" style="width: 0%"></div>
-                        </div>
+                    <div class="checks">
+                        ${(Array.isArray(service.checks) ? service.checks : []).map((check, cIndex) => `
+                            <div class="check-row">
+                                <div class="check-row-header">
+                                    <span class="check-chip ${check.status.toLowerCase()}">${escapeHtml(check.check_type)}</span>
+                                    <span class="detail-label">${escapeHtml(check.status)}</span>
+                                </div>
+                                <div class="check-meta">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Status</div>
+                                        <div class="detail-value">${escapeHtml(check.status)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Response</div>
+                                        <div class="detail-value">
+                                            ${check.response_time_ms !== null ? check.response_time_ms + 'ms' : 'N/A'}
+                                        </div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Uptime</div>
+                                        <div class="detail-value">${check.uptime_percentage.toFixed(1)}%</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Last Check</div>
+                                        <div class="detail-value">${formatTime(check.last_check)}</div>
+                                    </div>
+                                </div>
+                                ${check.message ? `<div class="message">${escapeHtml(check.message)}</div>` : ''}
+                                <div class="next-check">
+                                    <div class="next-check-label">
+                                        <span>Next check in</span>
+                                        <span class="next-check-time" data-next-check="${index}-${cIndex}">calculating...</span>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" data-progress="${index}-${cIndex}" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `).join('');

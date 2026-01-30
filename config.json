@@ -3,30 +3,20 @@
     {
       "name": "Google",
       "url": "https://www.google.com",
-      "check_type": "Http",
-      "interval_seconds": 30,
-      "timeout_ms": 5000
+      "checks": [
+        { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
+        { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 },
+        { "check_type": "Dns", "interval_seconds": 300, "timeout_ms": 3000 }
+      ]
     },
     {
       "name": "GitHub",
       "url": "https://github.com",
-      "check_type": "Http",
-      "interval_seconds": 30,
-      "timeout_ms": 5000
-    },
-    {
-      "name": "Google DNS",
-      "url": "google.com",
-      "check_type": "Dns",
-      "interval_seconds": 60,
-      "timeout_ms": 3000
-    },
-    {
-      "name": "Cloudflare DNS",
-      "url": "cloudflare.com",
-      "check_type": "Dns",
-      "interval_seconds": 60,
-      "timeout_ms": 3000
+      "checks": [
+        { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
+        { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 },
+        { "check_type": "Dns", "interval_seconds": 300, "timeout_ms": 3000 }
+      ]
     }
   ]
 }

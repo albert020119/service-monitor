@@ -9,10 +9,15 @@ pub enum CheckType {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Service {
-    pub name: String,
-    pub url: String,
+pub struct CheckConfig {
     pub check_type: CheckType,
     pub interval_seconds: u64,
     pub timeout_ms: u64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct Service {
+    pub name: String,
+    pub url: String,
+    pub checks: Vec<CheckConfig>,
 }
