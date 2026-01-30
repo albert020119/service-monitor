@@ -14,8 +14,41 @@
       "url": "https://github.com",
       "checks": [
         { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
+        { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 }
+      ]
+    },
+    {
+      "name": "Cloudflare",
+      "url": "https://www.cloudflare.com",
+      "checks": [
+        { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
         { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 },
         { "check_type": "Dns", "interval_seconds": 300, "timeout_ms": 3000 }
+      ]
+    },
+    {
+      "name": "Wikipedia",
+      "url": "https://www.wikipedia.org",
+      "checks": [
+        { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
+        { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 },
+        { "check_type": "Dns", "interval_seconds": 300, "timeout_ms": 3000 }
+      ]
+    },
+    {
+      "name": "Rust Lang",
+      "url": "https://www.rust-lang.org",
+      "checks": [
+        { "check_type": "Http", "interval_seconds": 30, "timeout_ms": 5000 },
+        { "check_type": "Ssl", "interval_seconds": 60, "timeout_ms": 5000 },
+        { "check_type": "Dns", "interval_seconds": 300, "timeout_ms": 3000 }
+      ]
+    },
+    {
+      "name": "Example TCP (HTTPS port)",
+      "url": "example.com:443",
+      "checks": [
+        { "check_type": "Tcp", "interval_seconds": 30, "timeout_ms": 2000 }
       ]
     }
   ]
