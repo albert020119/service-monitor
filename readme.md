@@ -59,7 +59,7 @@ Each check:
 }
 ```
 
-For more detail and troubleshooting, see `CONFIGURATION.md`.
+For more detail and troubleshooting, see `documentation/CONFIGURATION.md`.
 
 ## Dashboard + API
 
