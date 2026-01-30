@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 
+#[allow(dead_code)]
 pub struct Incident {
     pub service_name: String,
     pub started_at: DateTime<Utc>,

@@ -1,7 +1,7 @@
-use axum::{Router, Extension};
-use axum::routing::get;
-use tokio::net::TcpListener;
 use crate::state::AppState;
+use axum::routing::get;
+use axum::{Extension, Router};
+use tokio::net::TcpListener;
 
 mod routes;
 

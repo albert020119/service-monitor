@@ -1,6 +1,7 @@
 use reqwest::Client;
 use serde_json::json;
 
+#[allow(dead_code)]
 pub async fn send_slack(text: &str, webhook_url: &str) {
     let payload = json!({ "text": text });
     let body = serde_json::to_vec(&payload).unwrap();

@@ -1,11 +1,11 @@
 use crate::config::Config;
-use crate::models::service::{CheckType, CheckConfig, Service};
+use crate::models::service::{CheckConfig, CheckType, Service};
 use crate::state::AppState;
 
-pub mod http_check;
-pub mod tcp_check;
 pub mod dns_check;
+pub mod http_check;
 pub mod ssl_check;
+pub mod tcp_check;
 
 pub async fn start_monitoring(config: Config, state: AppState) {
     for service in config.services {
@@ -15,7 +15,8 @@ pub async fn start_monitoring(config: Config, state: AppState) {
             tokio::spawn(async move {
                 loop {
                     run_check(&service_clone, &check, &state_clone).await;
-                    tokio::time::sleep(std::time::Duration::from_secs(check.interval_seconds)).await;
+                    tokio::time::sleep(std::time::Duration::from_secs(check.interval_seconds))
+                        .await;
                 }
             });
         }

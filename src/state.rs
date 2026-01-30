@@ -1,8 +1,8 @@
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CheckStatus {
@@ -61,7 +61,7 @@ impl AppState {
         interval_seconds: u64,
     ) {
         let mut services = self.services.write().await;
-        
+
         let service = services.entry(name.clone()).or_insert(ServiceStatus {
             name: name.clone(),
             url: url.clone(),
@@ -80,7 +80,11 @@ impl AppState {
 
         let now = Utc::now();
 
-        let check = match service.checks.iter_mut().find(|c| c.check_type == check_type) {
+        let check = match service
+            .checks
+            .iter_mut()
+            .find(|c| c.check_type == check_type)
+        {
             Some(existing) => existing,
             None => {
                 service.checks.push(CheckStatus {
@@ -109,7 +113,7 @@ impl AppState {
         } else {
             check.status = HealthStatus::Down;
         }
-        
+
         check.last_check = now;
         check.response_time_ms = response_time_ms;
         check.message = message;
@@ -141,7 +145,10 @@ fn recompute_service_aggregate(service: &mut ServiceStatus) {
         return;
     }
 
-    let any_down = service.checks.iter().any(|c| c.status == HealthStatus::Down);
+    let any_down = service
+        .checks
+        .iter()
+        .any(|c| c.status == HealthStatus::Down);
     let all_up = service.checks.iter().all(|c| c.status == HealthStatus::Up);
 
     service.status = if any_down {
@@ -175,7 +182,10 @@ fn recompute_service_aggregate(service: &mut ServiceStatus) {
     service.response_time_ms = if response_times.is_empty() {
         None
     } else {
-        Some((response_times.iter().sum::<u64>() as f64 / response_times.len() as f64).round() as u64)
+        Some(
+            (response_times.iter().sum::<u64>() as f64 / response_times.len() as f64).round()
+                as u64,
+        )
     };
 
     if service.status == HealthStatus::Down {
@@ -190,4 +200,3 @@ fn recompute_service_aggregate(service: &mut ServiceStatus) {
         service.message.clear();
     }
 }
-

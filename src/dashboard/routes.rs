@@ -1,8 +1,9 @@
-use axum::{Json, Extension, response::Html};
 use crate::state::AppState;
+use axum::{response::Html, Extension, Json};
 
 pub async fn index() -> Html<&'static str> {
-    Html(r#"
+    Html(
+        r#"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -515,7 +516,8 @@ pub async fn index() -> Html<&'static str> {
     </script>
 </body>
 </html>
-    "#)
+    "#,
+    )
 }
 
 pub async fn status(Extension(state): Extension<AppState>) -> Json<serde_json::Value> {

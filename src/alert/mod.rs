@@ -1,3 +1,3 @@
-pub mod slack;
 pub mod email;
+pub mod slack;
 pub mod webhook;

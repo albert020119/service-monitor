@@ -1,2 +1,2 @@
-pub mod service;
 pub mod incident;
+pub mod service;
